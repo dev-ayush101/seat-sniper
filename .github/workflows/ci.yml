@@ -54,6 +54,8 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and test backend
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: ./mvnw verify -B
 
       - name: Set up Node 20
