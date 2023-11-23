@@ -16,24 +16,24 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/events")
 @RequiredArgsConstructor
 public class EventController {
 
     private final EventService eventService;
     private final SeatUpdateEmitter seatUpdateEmitter;
 
-    @GetMapping("/events/{eventId}")
+    @GetMapping("/{eventId}")
     public ResponseEntity<EventDetailResponse> getEvent(@PathVariable UUID eventId) {
         return ResponseEntity.ok(eventService.getEvent(eventId));
     }
 
-    @GetMapping(value = "/events/{eventId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/{eventId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamSeatUpdates(@PathVariable UUID eventId) {
         return seatUpdateEmitter.subscribe(eventId);
     }
 
-    @GetMapping("/events/search")
+    @GetMapping("/search")
     public ResponseEntity<Page<Event>> search(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,

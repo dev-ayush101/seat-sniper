@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import api from '../api';
 
@@ -13,15 +14,18 @@ export default function Event() {
   const [booking, setBooking] = useState(false);
 
   // queue state
+  const { isLoggedIn, userEmail } = useAuth();
   const [email, setEmail] = useState('');
   const [inQueue, setInQueue] = useState(false);
   const [admitted, setAdmitted] = useState(false);
   const [position, setPosition] = useState(0);
 
-  const joinQueue = async () => {
-    if (!email.trim()) return toast.error('Enter your email');
+  const joinQueue = async (queueEmail) => {
+    const emailToUse = queueEmail || email;
+    if (!emailToUse.trim()) return toast.error('Enter your email');
+    setEmail(emailToUse);
     try {
-      const res = await api.post(`/queue/${eventId}/join?userEmail=${encodeURIComponent(email)}`);
+      const res = await api.post(`/queue/${eventId}/join?userEmail=${encodeURIComponent(emailToUse)}`);
       setPosition(res.data.position);
       if (res.data.admitted) {
         setAdmitted(true);
@@ -85,6 +89,11 @@ export default function Event() {
   };
 
   const handleReserve = async () => {
+    if (!isLoggedIn) {
+      toast.error('Please sign in to book tickets');
+      navigate('/login');
+      return;
+    }
     if (selected.length === 0) return toast.error('Select at least one seat');
     setBooking(true);
     try {
@@ -114,23 +123,23 @@ export default function Event() {
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Waiting Room</h1>
 
         {!inQueue ? (
-          <>
-            <p className="text-gray-500 text-sm mb-6">Enter your email to join the queue for this event.</p>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && joinQueue()}
-              placeholder="you@example.com"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded mb-4 text-sm focus:outline-none focus:border-[#dc3558]"
-            />
-            <button
-              onClick={joinQueue}
-              className="w-full py-2.5 bg-[#dc3558] text-white rounded font-medium hover:bg-[#c22d4e] text-sm"
-            >
-              Join Queue
-            </button>
-          </>
+          isLoggedIn ? (
+            <>
+              <p className="text-gray-500 text-sm mb-6">Ready to join the queue as <strong>{userEmail}</strong></p>
+              <button
+                onClick={() => joinQueue(userEmail)}
+                className="w-full py-2.5 bg-[#dc3558] text-white rounded font-medium hover:bg-[#c22d4e] text-sm"
+              >
+                Join Queue
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-500 text-sm mb-6">
+                Please <a href="/login" className="text-[#dc3558] hover:underline font-medium">sign in</a> to join the queue for this event.
+              </p>
+            </>
+          )
         ) : (
           <>
             <div className="mt-8 mb-4">
