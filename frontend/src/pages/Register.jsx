@@ -15,6 +15,18 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{7,}$/.test(password)) {
+      setError('Password must be at least 7 characters with one uppercase, one lowercase, one number, and one special character (@$#!%*?&)');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -94,7 +106,7 @@ export default function Register() {
                   <input type="checkbox" checked={showPassword} onChange={() => setShowPassword(!showPassword)} className="accent-[#dc3558]" />
                   <span className="text-xs text-gray-500">Show password</span>
                 </label>
-                <p className="text-xs text-gray-400">Min 6 characters</p>
+                <p className="text-xs text-gray-400">Min 7 chars: uppercase, lowercase, number, symbol</p>
               </div>
             </div>
             <button
