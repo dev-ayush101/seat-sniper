@@ -6,13 +6,17 @@ import Checkout from './pages/Checkout';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Admin from './pages/Admin';
 
 function NavBar() {
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout, userRole } = useAuth();
   return (
     <nav className="bg-[#dc3558] px-6 py-3 flex justify-between items-center">
       <a href="/" className="text-xl font-bold text-white">🎟️ SeatSniper</a>
-      <div>
+      <div className="flex items-center gap-4">
+        {userRole === 'ADMIN' && (
+          <a href="/admin" className="text-white text-sm hover:underline">Admin</a>
+        )}
         {isLoggedIn ? (
           <button onClick={logout} className="px-4 py-1.5 border border-white text-white text-sm rounded hover:bg-white hover:text-[#dc3558] transition">Logout</button>
         ) : (
@@ -40,9 +44,8 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/" element={<Home />} />
             <Route path="/event/:eventId" element={<Event />} />
-            <Route path="/checkout/:bookingId" element={
-              <ProtectedRoute><Checkout /></ProtectedRoute>
-            } />
+            <Route path="/checkout/:bookingId" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           </Routes>
         </div>
       </AuthProvider>

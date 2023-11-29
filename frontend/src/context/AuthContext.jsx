@@ -30,11 +30,21 @@ export function AuthProvider({ children }) {
     setRefreshToken(null);
   };
 
+  const getUserRole = () => {
+    if (!accessToken) return null;
+    try {
+        return jwtDecode(accessToken).role;
+    } catch {
+        return null;
+    }
+  };
+
   const isLoggedIn = !!accessToken;
   const userEmail = getUserEmail();
+  const userRole = getUserRole();
 
   return (
-    <AuthContext.Provider value={{ accessToken, refreshToken, login, logout, isLoggedIn, userEmail }}>
+    <AuthContext.Provider value={{ accessToken, refreshToken, login, logout, isLoggedIn, userEmail, userRole }}>
       {children}
     </AuthContext.Provider>
   );
