@@ -3,6 +3,7 @@ package com.ticketmaster.ticketmaster.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,4 +15,5 @@ public class CreateEventRequest {
     private String eventType;
     private UUID venueId;
     private UUID performerId;
+    private BigDecimal ticketPrice;
 }
