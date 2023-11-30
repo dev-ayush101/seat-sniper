@@ -10,6 +10,7 @@ import com.ticketmaster.ticketmaster.repository.BookingRepository;
 import com.ticketmaster.ticketmaster.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,5 +133,15 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.CONFIRMED);
         return bookingRepository.save(booking);
+    }
+
+    @Scheduled(fixedRate = 600000)
+    public void expireStaleBookings() {
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);
+        List<Booking> stale = bookingRepository.findByStatusAndCreatedAtBefore(BookingStatus.IN_PROGRESS, cutoff);
+        for (Booking booking : stale) {
+            booking.setStatus(BookingStatus.EXPIRED);
+            bookingRepository.save(booking);
+        }
     }
 }
