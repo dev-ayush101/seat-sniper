@@ -150,6 +150,18 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
+    public List<Booking> getMyBookings(String email) {
+        List<Booking> bookings = bookingRepository.findByUserEmailOrderByCreatedAtDesc(email);
+        for (Booking booking : bookings) {
+            List<Ticket> allTickets = ticketRepository.findByEventId(booking.getEventId());
+            BigDecimal multiplier = pricingService.getSurgeMultiplier(allTickets);
+            for (Ticket ticket : booking.getTickets()) {
+                ticket.setPrice(pricingService.applySurge(ticket.getPrice(), multiplier));
+            }
+        }
+        return bookings;
+    }
+
     @Scheduled(fixedRate = 600000)
     public void expireStaleBookings() {
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(10);

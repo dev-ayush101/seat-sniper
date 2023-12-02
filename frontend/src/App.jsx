@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
+import MyBookings from './pages/MyBookings';
 
 function NavBar() {
   const { isLoggedIn, logout, userRole } = useAuth();
@@ -14,6 +15,9 @@ function NavBar() {
     <nav className="bg-[#dc3558] px-6 py-3 flex justify-between items-center">
       <a href="/" className="text-xl font-bold text-white">🎟️ SeatSniper</a>
       <div className="flex items-center gap-4">
+        {isLoggedIn && (
+          <a href="/bookings" className="text-white text-sm hover:underline">My Bookings</a>
+        )}
         {userRole === 'ADMIN' && (
           <a href="/admin" className="text-white text-sm hover:underline">Admin</a>
         )}
@@ -46,6 +50,7 @@ export default function App() {
             <Route path="/event/:eventId" element={<Event />} />
             <Route path="/checkout/:bookingId" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+            <Route path="/bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
           </Routes>
         </div>
       </AuthProvider>

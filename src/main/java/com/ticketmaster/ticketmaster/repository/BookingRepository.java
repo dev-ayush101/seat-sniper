@@ -10,4 +10,5 @@ import java.util.UUID;
 
 public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findByStatusAndCreatedAtBefore(BookingStatus status, LocalDateTime cutoff);
+    List<Booking> findByUserEmailOrderByCreatedAtDesc(String userEmail);
 }

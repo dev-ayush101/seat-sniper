@@ -5,8 +5,11 @@ import com.ticketmaster.ticketmaster.model.Booking;
 import com.ticketmaster.ticketmaster.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -29,5 +32,11 @@ public class BookingController {
     @PostMapping("/{bookingId}/confirm")
     public ResponseEntity<Booking> confirm(@PathVariable UUID bookingId, @RequestParam String userEmail) {
         return ResponseEntity.ok(bookingService.confirmBooking(bookingId, userEmail));
+    }
+
+    @GetMapping("/my")
+    public List<Booking> getMyBookings() {
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        return bookingService.getMyBookings(email);
     }
 }
