@@ -27,6 +27,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final TicketRepository ticketRepository;
     private final EventSearchService eventSearchService;
+    private final PricingService pricingService;
 
     private final StringRedisTemplate redisTemplate;
 
@@ -47,6 +48,9 @@ public class EventService {
                 ticket.setStatus(TicketStatus.RESERVED);
             }
         }
+
+        // Apply dynamic pricing based on fill percentage
+        pricingService.applyDynamicPricing(tickets);
 
         return EventDetailResponse.builder()
                 .event(event)

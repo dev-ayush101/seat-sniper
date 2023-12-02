@@ -32,12 +32,21 @@ public class BookingService {
     private final SeatUpdateEmitter seatUpdateEmitter;
 
     private final WaitingQueueService waitingQueueService;
+    private final PricingService pricingService;
 
     private static final Duration LOCK_TTL = Duration.ofMinutes(10);
 
     public Booking getBooking(UUID bookingId) {
-        return bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        List<Ticket> allTickets = ticketRepository.findByEventId(booking.getEventId());
+        BigDecimal multiplier = pricingService.getSurgeMultiplier(allTickets);
+        for (Ticket ticket : booking.getTickets()) {
+            ticket.setPrice(pricingService.applySurge(ticket.getPrice(), multiplier));
+        }
+
+        return booking;
     }
 
     public Booking reserveTickets(UUID eventId, BookingRequest request) {
@@ -73,9 +82,15 @@ public class BookingService {
                 tickets.add(ticket);
             }
 
-            BigDecimal total = tickets.stream()
-                    .map(Ticket::getPrice)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            // Get all tickets for this event to calculate fill percentage
+            List<Ticket> allTickets = ticketRepository.findByEventId(eventId);
+            BigDecimal multiplier = pricingService.getSurgeMultiplier(allTickets);
+
+            BigDecimal total = BigDecimal.ZERO;
+            for (Ticket ticket : tickets) {
+                BigDecimal surgePrice = pricingService.applySurge(ticket.getPrice(), multiplier);
+                total = total.add(surgePrice);
+            }
 
             Booking booking = Booking.builder()
                     .userEmail(request.getUserEmail())
