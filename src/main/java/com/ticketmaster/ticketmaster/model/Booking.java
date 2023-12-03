@@ -36,4 +36,7 @@ public class Booking {
     private LocalDateTime createdAt;
 
     private BigDecimal surgeMultiplier = BigDecimal.ONE;
+
+    @Transient
+    private String eventName;
 }

@@ -50,7 +50,8 @@ export default function MyBookings() {
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <p className="text-xs text-gray-400 font-mono mb-1">#{booking.id.substring(0, 8)}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm font-medium text-gray-900">{booking.eventName || 'Unknown Event'}</p>
+                  <p className="text-xs text-gray-500">
                     {booking.tickets?.length} {booking.tickets?.length === 1 ? 'ticket' : 'tickets'}
                   </p>
                 </div>

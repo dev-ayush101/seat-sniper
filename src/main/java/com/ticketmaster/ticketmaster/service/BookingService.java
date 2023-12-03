@@ -7,6 +7,7 @@ import com.ticketmaster.ticketmaster.model.BookingStatus;
 import com.ticketmaster.ticketmaster.model.Ticket;
 import com.ticketmaster.ticketmaster.model.TicketStatus;
 import com.ticketmaster.ticketmaster.repository.BookingRepository;
+import com.ticketmaster.ticketmaster.repository.EventRepository;
 import com.ticketmaster.ticketmaster.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,6 +28,7 @@ public class BookingService {
 
     private final TicketRepository ticketRepository;
     private final BookingRepository bookingRepository;
+    private final EventRepository eventRepository;
     private final StringRedisTemplate redisTemplate;
 
     private final SeatUpdateEmitter seatUpdateEmitter;
@@ -154,6 +156,8 @@ public class BookingService {
             for (Ticket ticket : booking.getTickets()) {
                 ticket.setPrice(pricingService.applySurge(ticket.getPrice(), booking.getSurgeMultiplier()));
             }
+            eventRepository.findById(booking.getEventId())
+                    .ifPresent(event -> booking.setEventName(event.getName()));
         }
         return bookings;
     }
