@@ -34,4 +34,6 @@ public class Booking {
     private List<Ticket> tickets;
 
     private LocalDateTime createdAt;
+
+    private BigDecimal surgeMultiplier = BigDecimal.ONE;
 }

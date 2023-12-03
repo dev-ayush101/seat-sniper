@@ -1,0 +1,1 @@
+ALTER TABLE bookings ADD COLUMN surge_multiplier DECIMAL(4,2) DEFAULT 1.0;
